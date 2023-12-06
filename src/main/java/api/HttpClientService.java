@@ -1,4 +1,9 @@
+package api;
+
 import com.google.gson.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -9,15 +14,17 @@ import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
+@Getter
+@Setter
+@AllArgsConstructor
 public class HttpClientService<T> {
-    private static HttpClient client = HttpClient.newHttpClient();
+    public static HttpClient client = HttpClient.newHttpClient();
 
     public T getISSCurentLocation(String url, Class<T> responseClass) {
         HttpClient client = HttpClient.newHttpClient();
         var request = HttpRequest
                 .newBuilder()
-                .uri(URI.create("http://api.open-notify.org/iss-now.json"))
+                .uri(URI.create(url))
                 .GET()
                 .header("Accept", "application/json")
                 .build();

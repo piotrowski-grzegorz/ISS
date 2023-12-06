@@ -1,3 +1,6 @@
+import api.iss_current_location.CurrentLocationResponse;
+import services.IssService;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -27,7 +30,12 @@ public class Main {
             switch (input) {
                 case "S":
                     System.out.println("CHECKING SPEED OF ISS...");
-                    System.out.println("SPEED IS 10000 KM/H");
+                    final CurrentLocationResponse locationFromOpenNotify = new IssService().getLocationFromOpenNotify();
+                    System.out.println("Connected with ISS?: " + locationFromOpenNotify.getMessage());
+                    var pos = locationFromOpenNotify.getIss_position();
+                    System.out.println("POSITION:");
+                    System.out.println("Latitude: " + locationFromOpenNotify.getIss_position().getLatitude());
+                    System.out.println("Longitude: " + locationFromOpenNotify.getIss_position().getLongitude());
                     isRunning = goBackToMenu();
                     break;
 
@@ -52,7 +60,7 @@ public class Main {
                     break;
             }
         }
-        //HttpClientService
+        //api.HttpClientService
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest
                 .newBuilder()

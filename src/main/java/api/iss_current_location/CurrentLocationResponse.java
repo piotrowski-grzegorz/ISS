@@ -1,4 +1,4 @@
-package iss_current_location;
+package api.iss_current_location;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +12,6 @@ import java.time.LocalDateTime;
 public class CurrentLocationResponse {
     String message;
     LocalDateTime timeStamp;
-    IssPosition issposition;
+    Iss_Position iss_position;
 
 }
