@@ -1,10 +1,17 @@
 import api.iss_current_location.CurrentLocationResponse;
+import api.people_in_space.PeopleInSpaceResponse;
+import db.ISSCLDataEntity;
+import db.ISSCLDataEntityMapper;
+import db.ISSCLDb;
+import handlers.CalculateVelocityOfISS;
 import services.IssService;
 
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -18,75 +25,32 @@ public class Main {
     //ZADANIE 2 - OBLICZANIE PRĘDKOŚCI ISS
     //ZADANIE 3 - ZWRACANIE LISTY NADCHODZĄCYCH PRZEBIEGÓW ISS DLA OKREŚLONEJ LOKALIZACJI
     //ZADANIE 4 - ZWRACANIE LICZBY OSÓB PRZEBYWAJĄCYCH W KOSMOSIE W RAMACH ISS
-
+    public static final ISSCLDb DATA_BASE = new ISSCLDb();
 
     public static void main(String[] args) {
+        System.out.println("Hello World");
+
+        final List<BigDecimal> savedPositionsOfISS = new ArrayList<>();
+
+        savedPositionsOfISS.stream().forEach(position -> {
+            final CurrentLocationResponse response = new IssService().getLocationFromOpenNotify();
+            final ISSCLDataEntity entity = ISSCLDataEntityMapper.from(response);
+            DATA_BASE.add(entity);
+        });
+
+
+
         boolean isRunning = true;
         boolean returnMenu = false;
-        Scanner scanner = new Scanner(System.in);
-
         while (isRunning) {
+            Scanner scanner = new Scanner(System.in);
             openScreen();
             String input = scanner.nextLine();
             switch (input) {
                 case "S":
-                    System.out.println("CHECKING SPEED OF ISS...");
-                    final CurrentLocationResponse locationFromOpenNotify = new IssService().getLocationFromOpenNotify();
-
-                    System.out.println("Connected with api.open-notify.org/iss-now:? " + locationFromOpenNotify.getMessage());
-                    var pos = locationFromOpenNotify.getIss_position();
-                    System.out.println("POSITION:");
-                    System.out.println("Latitude: " + locationFromOpenNotify.getIss_position().getLatitude());
-                    System.out.println("Longitude: " + locationFromOpenNotify.getIss_position().getLongitude());
-                    int secondsToSleep = 5;
-                    System.out.println("WAITING FOR SECOND POSITION...");
-                    try {
-                        Thread.sleep(secondsToSleep * 1000);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                    }
-                    System.out.println("");
-                    System.out.println("POSITION AFTER 5 SEC:");
-                    final CurrentLocationResponse locationFromOpenNotify2 = new IssService().getLocationFromOpenNotify();
-                    System.out.println("Latitude2: " + locationFromOpenNotify2.getIss_position().getLatitude());
-                    System.out.println("Longitude2: " + locationFromOpenNotify2.getIss_position().getLongitude());
-                    var lat1 = locationFromOpenNotify.getIss_position().getLatitude();
-                    var lat2 = locationFromOpenNotify2.getIss_position().getLatitude();
-                    var longitude1 = locationFromOpenNotify.getIss_position().getLongitude();
-                    var longitude2 = locationFromOpenNotify2.getIss_position().getLongitude();
-                    BigDecimal resultLat = lat1.subtract(lat2);
-                    BigDecimal resultLong = longitude1.subtract(longitude2);
-                    System.out.println("result Latitude: " + resultLat);
-                    System.out.println("result Longitude: " + resultLong);
-                    // 1 stopien = 111 km - szerokosc // 1 minuta = 1,85 km dlugosc
-
-                    BigDecimal constantLongitute = BigDecimal.valueOf(1.85);
-                    BigDecimal constantLatitude = BigDecimal.valueOf(111);
-                    BigDecimal latitudeChange = resultLat.multiply(constantLatitude);
-                    BigDecimal longitudeChange = resultLong.multiply(constantLongitute);
-                    System.out.println("latitudeChange: " + latitudeChange);
-                    System.out.println("longitudeChange: " + longitudeChange);
-                    System.out.println("");
-                    var velocity = latitudeChange.divide(BigDecimal.valueOf(5));
-                    var velocity2 = velocity.subtract(velocity).subtract(velocity);
-
-                    System.out.println("ISS Velocity is " + velocity2 + "[km/s]");
-
-
-
-
-//                    //OBLICZANIE PRĘDKOŚCI SATELITY // WZOR NA PREDKOSC SATELITY
-//                    final double gravityConstant = 6.67 * Math.pow(10, -11);
-//                    final double massOfEarth = 5.98 * Math.pow(10, 24);
-//                    final double earthRadiusConstant = 6378;
-//                    final double distanceFromEarth = 400 * earthRadiusConstant;
-//                    double velocity = Math.sqrt(gravityConstant*massOfEarth/distanceFromEarth);
-//                    System.out.println("velocity: " + velocity);
-
-
+                    new CalculateVelocityOfISS().calculateVolecity();
+                    System.out.println(DATA_BASE.get(1L));
                     isRunning = goBackToMenu();
-                    // calculate speed
-
                     break;
 
                 case "R":
@@ -96,6 +60,11 @@ public class Main {
 
                 case "P":
                     System.out.println("CHECKING CREW....");
+                    System.out.println("CHECKING CREW ON ISS...");
+                    final PeopleInSpaceResponse peopleFromOpenNotify = new IssService().getPeopleInSpace();
+
+                    System.out.println("Connected with api.open-notify.org/iss-now:? " + peopleFromOpenNotify.getMessage());
+                    peopleFromOpenNotify.getPeople().forEach(people -> System.out.println(people.getName()));
                     isRunning = goBackToMenu();
                     break;
 

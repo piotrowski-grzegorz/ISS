@@ -12,6 +12,6 @@ import java.time.LocalDateTime;
 public class CurrentLocationResponse {
     String message;
     LocalDateTime timeStamp;
-    Iss_Position iss_position;
+    IssPosition iss_position;
 
 }

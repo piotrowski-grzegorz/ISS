@@ -1,9 +1,6 @@
 package api;
 
 import com.google.gson.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -14,9 +11,6 @@ import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-@Getter
-@Setter
-@AllArgsConstructor
 public class HttpClientService<T> {
     public static HttpClient client = HttpClient.newHttpClient();
 

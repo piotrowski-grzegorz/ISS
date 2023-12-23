@@ -1,4 +1,4 @@
-package api.iss_current_location;
+package db;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @AllArgsConstructor
-
-public class Iss_Position {
+public class IssPositionEntity {
     BigDecimal longitude;
     BigDecimal latitude;
 }
